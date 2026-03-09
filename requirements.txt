@@ -1,7 +1,8 @@
-plotly
 streamlit
 scikit-learn
 pandas
 numpy
 nltk
 joblib
+wordcloud
+matplotlib
