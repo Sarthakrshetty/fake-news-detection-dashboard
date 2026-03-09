@@ -3,6 +3,8 @@ import joblib
 import numpy as np
 import pandas as pd
 import plotly.express as px
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
 
 # Load model
 model = joblib.load("fake_news_model.pkl")
@@ -21,85 +23,102 @@ label_map = {
     "reliable": "Reliable News"
 }
 
-# Page configuration
+# Page config
 st.set_page_config(
-    page_title="Fake News Detection Dashboard",
-    page_icon="📰",
+    page_title="Fake News AI Dashboard",
+    page_icon="🧠",
     layout="wide"
 )
 
-# ------------------- THEME -------------------
-
+# ---------- THEME ----------
 st.markdown("""
 <style>
 
-/* Main dashboard background */
 .stApp {
-background: linear-gradient(135deg,#1e293b,#0f172a);
-color:#ffffff;
+background: linear-gradient(135deg,#0f172a,#1e293b);
+color:white;
 }
 
-/* Sidebar color */
 section[data-testid="stSidebar"] {
-background: #0f172a;
+background:#020617;
 }
 
-/* Sidebar text */
 section[data-testid="stSidebar"] * {
+color:white !important;
+}
+
+/* FIX METRICS */
+
+[data-testid="stMetricValue"] {
 color:#ffffff !important;
+font-size:34px;
+font-weight:bold;
 }
 
-/* Titles */
-h1, h2, h3 {
-color:#f1f5f9;
+[data-testid="stMetricLabel"] {
+color:#cbd5f1 !important;
 }
 
-/* Paragraph text */
-p, div {
-color:#e2e8f0;
-}
+/* HERO BANNER */
 
-/* Metric cards */
-.metric-card {
-background: linear-gradient(135deg,#3b82f6,#1d4ed8);
-padding:20px;
+.hero-banner {
+background: linear-gradient(90deg,#020617,#1e3a8a);
+padding:30px;
 border-radius:12px;
 text-align:center;
-font-weight:bold;
-color:white;
+margin-bottom:20px;
 }
 
-/* Buttons */
-.stButton>button {
-background-color:#2563eb;
-color:white;
-border-radius:8px;
-border:none;
-padding:8px 16px;
-}
+/* NEWS CARDS */
 
-.stButton>button:hover {
-background-color:#1d4ed8;
-color:white;
+.news-card {
+background:#1e293b;
+padding:18px;
+border-radius:10px;
+text-align:center;
+font-size:18px;
 }
 
 </style>
 """, unsafe_allow_html=True)
 
-# ------------------- SIDEBAR -------------------
-
-st.sidebar.title("🧠 Fake News AI Dashboard")
+# ---------- SIDEBAR ----------
+st.sidebar.title("🧠 Fake News AI")
 
 menu = st.sidebar.radio(
     "Navigation",
     ["Home","Detect News","Analytics","Model Info"]
 )
 
-# ------------------- HOME -------------------
-
+# ---------- HOME ----------
 if menu == "Home":
 
-    st.title("📰 Fake News Detection System")
+    st.markdown("""
+    <div class="hero-banner">
+    <h1 style="color:white;">📰 Fake News Detection AI Platform</h1>
+    <p style="color:#cbd5f1;font-size:18px;">
+    AI-powered misinformation analysis using Machine Learning & NLP
+    </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Moving Breaking News
+    st.markdown("""
+    <div style="background:#ef4444;
+    color:white;
+    padding:10px;
+    border-radius:6px;
+    font-weight:bold;
+    margin-bottom:20px;">
+
+    <marquee behavior="scroll" direction="left" scrollamount="6">
+
+    🚨 Breaking: AI detecting misinformation patterns • Election propaganda analysis • Vaccine rumor detection • Media bias tracking • Global conspiracy monitoring
+
+    </marquee>
+
+    </div>
+    """, unsafe_allow_html=True)
 
     col1,col2,col3 = st.columns(3)
 
@@ -109,21 +128,33 @@ if menu == "Home":
 
     st.write("---")
 
+    st.subheader("AI News Intelligence")
+
     st.write("""
-This system analyzes news articles and detects misinformation patterns using **Machine Learning and NLP**.
+This AI system analyzes news articles and detects misinformation patterns
+using **Machine Learning and Natural Language Processing (NLP)**.
 
 Workflow:
 
 Dataset → Preprocessing → TF-IDF → ML Model → Prediction
 """)
 
-# ------------------- DETECT NEWS -------------------
+    st.write("")
 
+    st.subheader("Trending Fake News Topics")
+
+    col1,col2,col3 = st.columns(3)
+
+    col1.markdown('<div class="news-card">📰 Political Propaganda</div>', unsafe_allow_html=True)
+    col2.markdown('<div class="news-card">🧬 Health & Vaccine Rumors</div>', unsafe_allow_html=True)
+    col3.markdown('<div class="news-card">🌍 Global Conspiracy</div>', unsafe_allow_html=True)
+
+# ---------- DETECT NEWS ----------
 elif menu == "Detect News":
 
     st.title("🔎 Analyze News Article")
 
-    news_text = st.text_area("Paste News Article Here", height=200)
+    news_text = st.text_area("Paste news article here", height=200)
 
     if st.button("Analyze News"):
 
@@ -158,14 +189,12 @@ elif menu == "Detect News":
                 x="Category",
                 y="Probability",
                 color="Probability",
-                title="Prediction Probability Distribution",
-                color_continuous_scale="Blues"
+                title="Prediction Probability Distribution"
             )
 
             st.plotly_chart(fig,use_container_width=True)
 
-# ------------------- ANALYTICS -------------------
-
+# ---------- ANALYTICS ----------
 elif menu == "Analytics":
 
     st.title("📊 Dataset & Model Analytics")
@@ -193,8 +222,7 @@ elif menu == "Analytics":
         x="Model",
         y="Accuracy",
         color="Accuracy",
-        title="Model Accuracy Comparison",
-        color_continuous_scale="Blues"
+        title="Model Accuracy Comparison"
     )
 
     st.plotly_chart(fig1,use_container_width=True)
@@ -213,50 +241,31 @@ elif menu == "Analytics":
         df_fake_real,
         x="Category",
         y="Count",
-        color="Category",
-        title="Fake vs Real News Distribution"
+        color="Category"
     )
 
     st.plotly_chart(fig2,use_container_width=True)
 
-    st.subheader("Dataset Category Distribution")
+    st.subheader("Trending Fake News Keywords")
 
-    categories = [
-        "Fake","Bias","Conspiracy","Satire",
-        "Hate","State","Junk Science","Reliable"
-    ]
+    text_data = """
+    fake conspiracy propaganda hoax rumor election vaccine
+    misinformation media scandal politics secret government
+    """
 
-    counts = [12000,2000,500,800,300,200,100,3500]
+    wordcloud = WordCloud(
+        width=800,
+        height=400,
+        background_color="black"
+    ).generate(text_data)
 
-    df_dist = pd.DataFrame({
-        "Category":categories,
-        "Count":counts
-    })
+    fig, ax = plt.subplots()
+    ax.imshow(wordcloud, interpolation="bilinear")
+    ax.axis("off")
 
-    fig3 = px.pie(
-        df_dist,
-        names="Category",
-        values="Count",
-        title="News Category Distribution"
-    )
+    st.pyplot(fig)
 
-    st.plotly_chart(fig3,use_container_width=True)
-
-    st.subheader("Top News Categories")
-
-    fig4 = px.bar(
-        df_dist.sort_values("Count",ascending=False),
-        x="Category",
-        y="Count",
-        color="Count",
-        title="Top Categories in Dataset",
-        color_continuous_scale="Plasma"
-    )
-
-    st.plotly_chart(fig4,use_container_width=True)
-
-# ------------------- MODEL INFO -------------------
-
+# ---------- MODEL INFO ----------
 elif menu == "Model Info":
 
     st.title("🤖 Model Information")
@@ -275,7 +284,3 @@ Machine Learning Models Implemented:
 """)
 
     st.success("Best Performing Model: Random Forest")
-
-# Footer
-st.sidebar.write("---")
-st.sidebar.write("MSc Big Data Analytics Project")
