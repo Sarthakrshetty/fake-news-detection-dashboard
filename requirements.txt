@@ -6,3 +6,4 @@ nltk
 joblib
 wordcloud
 matplotlib
+plotly
